@@ -1,0 +1,3 @@
+recursive-include SNPknock *.py *pyx 
+recursive-include SNPknock/knockoffs *.cpp *h
+include *.txt
