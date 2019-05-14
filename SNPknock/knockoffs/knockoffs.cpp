@@ -17,23 +17,11 @@
     along with SNPknock.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef KNOCKOFF_MF_H
-#define KNOCKOFF_MF_H
+#ifndef KNOCKOFFS_CPP
+#define KNOCKOFFS_CPP
 
-/*
-MF knockoffs for a Discrete Markov Chain model
-*/
+#include "knockoffs.h"
 
-#include <vector>
-#include <random>
-
-typedef std::vector< std::vector<double> > matrix;
-
-namespace knockoffs{
-  class KnockoffMF {
-      int weighted_choice(double U, const std::vector<double> & weights);
-  };
-
-}
+using namespace knockoffs;
 
 #endif

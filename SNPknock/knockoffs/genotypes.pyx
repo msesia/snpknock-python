@@ -14,27 +14,19 @@
 #    along with SNPknock.  If not, see <http://www.gnu.org/licenses/>.
 
 # distutils: language=c++
-# distutils: sources=src/knockoffs/hmm.cpp
+# distutils: sources=src/knockoffs/genotypes.cpp
 
 # Cython interface file for wrapping the object
 #
 #
-from libcpp.vector cimport vector
-from src.knockoffs.dmc cimport KnockoffDMC
+
 import numpy as np
 
-# c++ interface to cython
-cdef extern from "hmm.h" namespace "knockoffs":
-    cdef cppclass KnockoffHMM:
-        KnockoffHMM(vector[double] initP, vector[vector[vector[double]]] Q, \
-                    vector[vector[vector[double]]] emissionP, vector[int] groups, seed) except +
-        vector[int] sample(vector[int] X)
-
 # creating a cython wrapper class
-cdef class knockoffHMM:
-    cdef KnockoffHMM *thisptr      # hold a C++ instance which we're wrapping
-    def __cinit__(self, initP, Q, emissionP, groups, seed):
-        self.thisptr = new KnockoffHMM(initP, Q, emissionP, groups, seed)
+cdef class knockoffGenotypes:
+    cdef GroupGenotypes *thisptr      # hold a C++ instance which we're wrapping
+    def __cinit__(self, r, alpha, theta, groups, seed):
+        self.thisptr = new GroupGenotypes(r, alpha, theta, groups, seed)
     def __dealloc__(self):
         del self.thisptr
     def sample(self, X):

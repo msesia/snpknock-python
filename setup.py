@@ -47,7 +47,7 @@ except:
 
 # Compiler flags
 EXTRA_COMPILE_ARGS = ["-O3", "-std=c++11"]
-EXTRA_LINK_ARGS = ["-static-libstdc++"]
+EXTRA_LINK_ARGS = ["-static-libstdc++", "-larmadillo"]
 UNDEF_MACROS = [ "NDEBUG" ]
 
 # Define extensions

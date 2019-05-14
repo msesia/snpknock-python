@@ -1,7 +1,7 @@
 /*
   This file is part of SNPknock.
 
-    Copyright (C) 2017 Matteo Sesia
+    Copyright (C) 2017-2019 Matteo Sesia
 
     SNPknock is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,16 +20,14 @@
 #ifndef KNOCKOFF_HMM_CPP
 #define KNOCKOFF_HMM_CPP
 
-#include "hmm_knock.h"
-
-using namespace knockoffs;
+#include "hmm.h"
 
 KnockoffHMM::KnockoffHMM(const std::vector<double> & _initP, const std::vector< matrix > & _Q, \
-                         const std::vector< matrix > & _emissionP, int seed) {
+                         const std::vector< matrix > & _emissionP, const std::vector<int>& G, int seed) {
   initP = _initP;
   Q = _Q;
   emissionP = _emissionP;
-  H_knockoffs = new KnockoffDMC(initP, Q, seed+100000);
+  H_knockoffs = new KnockoffDMC(initP, Q, G, seed+100000);
   nStates = initP.size();
   nEmitStates = emissionP[0].size();
   p = emissionP.size();
@@ -42,8 +40,8 @@ KnockoffHMM::KnockoffHMM(const std::vector<double> & _initP, const std::vector< 
   beta = matrix (p, std::vector<double> (nStates));
   std::fill(beta[p-1].begin(), beta[p-1].end(), 1.0);
   gen = std::mt19937();
-  gen.seed(seed);
   dis = std::uniform_real_distribution<double>(0.0,1.0);
+  gen.seed(seed);
 }
 
 KnockoffHMM::~KnockoffHMM(){
@@ -57,10 +55,10 @@ std::vector<int> KnockoffHMM::sample(const std::vector<int> & X) {
   sampleHMMConditional(X);
   // Create knockoff hidden states
   Ht = H_knockoffs->sample(H);
-  
+
   // Sample from the conditional distribution of the observations given the knockoff hidden states
-  for(unsigned int j=0; j<p; j++) {
-    for(unsigned int s=0; s<nEmitStates; s++) {
+  for(int j=0; j<p; j++) {
+    for(int s=0; s<nEmitStates; s++) {
       weightsEmit[s] = emissionP[j][s][Ht[j]];
     }
     Xt[j] = weighted_choice(dis(gen),weightsEmit);
@@ -69,7 +67,7 @@ std::vector<int> KnockoffHMM::sample(const std::vector<int> & X) {
 }
 
 std::vector< std::vector<int> > KnockoffHMM::sample(const std::vector<std::vector<int> > & X) {
-  unsigned int n = X.size();
+  int n = X.size();
   std::vector< std::vector<int> > XtMatrix(n, std::vector<int>(p));
   for(unsigned int i=0; i<X.size(); i++) {
     XtMatrix[i] = sample(X[i]);
@@ -79,22 +77,24 @@ std::vector< std::vector<int> > KnockoffHMM::sample(const std::vector<std::vecto
 
 void KnockoffHMM::sampleHMMConditional(const std::vector<int> & X) {
   double weights_sum = 0.0;
-  for(unsigned int k=0; k<nStates; k++) {
+  for(int k=0; k<nStates; k++) {
     weights[k] = initP[k] * emissionP[0][X[0]][k] * beta[0][k];
     weights_sum += weights[k];
   }
-  for(unsigned int k=0; k<nStates; k++) {
+
+  for(int k=0; k<nStates; k++) {
     weights[k] /= weights_sum;
   }
   H[0] = weighted_choice(dis(gen),weights);
- 
-  for(unsigned int j=1; j<p; j++) {
+
+  for(int j=1; j<p; j++) {
     weights_sum = 0.0;
-    for(unsigned int k=0; k<nStates; k++) {
+    for(int k=0; k<nStates; k++) {
       weights[k] = Q[j-1][H[j-1]][k] * emissionP[j][X[j]][k] * beta[j][k];
       weights_sum += weights[k];
     }
-    for(unsigned int k=0; k<nStates; k++) {
+
+    for(int k=0; k<nStates; k++) {
       weights[k] /= weights_sum;
     }
     H[j] = weighted_choice(dis(gen),weights);
@@ -103,20 +103,22 @@ void KnockoffHMM::sampleHMMConditional(const std::vector<int> & X) {
 
 void KnockoffHMM::backwardHMM(const std::vector<int> & X) {
   std::fill(beta[p-1].begin(), beta[p-1].end(), 1.0);
+
   for(int j=p-2; j>=0; j--) {
-    for(unsigned int l=0; l<nStates; l++) {
+    for(int l=0; l<nStates; l++) {
       fBeta[l] = emissionP[j+1][X[j+1]][l] * beta[j+1][l];
     }
     betaSum = 0.0;
-    for(unsigned int k=0; k<nStates; k++) {
+    for(int k=0; k<nStates; k++) {
       beta[j][k] = std::inner_product(Q[j][k].begin(), Q[j][k].end(), fBeta.begin(), 0.0);
       betaSum += beta[j][k];
     }
-    for(unsigned int k=0; k<nStates; k++) {
+
+    for(int k=0; k<nStates; k++) {
       beta[j][k] /= betaSum;
     }
+
   }
 }
-
 
 #endif

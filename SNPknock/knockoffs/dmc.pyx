@@ -14,17 +14,19 @@
 #    along with SNPknock.  If not, see <http://www.gnu.org/licenses/>.
 
 # distutils: language=c++
-# distutils: sources=src/knockoffsMF/dmc_knock.cpp
+# distutils: sources=src/knockoffs/dmc.cpp
 
 # Cython interface file for wrapping the object
 #
 #
 
+import numpy as np
+
 # creating a cython wrapper class
 cdef class knockoffDMC:
     cdef KnockoffDMC *thisptr      # hold a C++ instance which we're wrapping
-    def __cinit__(self, initP, Q):
-        self.thisptr = new KnockoffDMC(initP, Q)
+    def __cinit__(self, initP, Q, groups, seed):
+        self.thisptr = new KnockoffDMC(initP, Q, groups, seed)
     def __dealloc__(self):
         del self.thisptr
     def sample(self, X):

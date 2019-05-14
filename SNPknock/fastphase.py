@@ -17,6 +17,7 @@
 
 import numpy as np
 import os
+import pdb # debug
 
 def runFastPhase(fp_path, X_file, out_path, K=12, numit=25, seed=1):
     """
@@ -56,7 +57,7 @@ def runFastPhase(fp_path, X_file, out_path, K=12, numit=25, seed=1):
     # Call fastPhase
     os.system(command)
 
-def loadFit(r_file, theta_file, alpha_file, x):
+def loadHMM(r_file, theta_file, alpha_file, char_file, compact=True, phased=False):
     """
     Load the parameter estimates obtained by fastPhase and assembles the HMM model
     for the genotype data. For more information about fastPhase format see:
@@ -65,10 +66,7 @@ def loadFit(r_file, theta_file, alpha_file, x):
     :param r_file: a string with the path of the "_rhat.txt" file produced by fastPhase.
     :param theta_file: a string with the path of the "_thetahat.txt" file produced by fastPhase.
     :param alpha_file: a string with the path of the "_alphahat.txt" file produced by fastPhase.
-    :param x: a numpy array of length p, where p is the number of SNPs, containing the genotype
-              sequence of the first individual in the dataset (the first individual is intended
-              in the same order as provided to fastPhase). This is needed in order to correctly
-              intepret the emission parameters estimated by fastPhase.
+    :param char_file: a string with the path of the "_origchars" file produced by fastPhase.
     :returns: a dictionary {'Q','pInit','pEmit'} where
 
         - Q is a numpy array of size (p-1,K,K), containing a list of p-1 transition matrices
@@ -79,26 +77,30 @@ def loadFit(r_file, theta_file, alpha_file, x):
           the hidden states for each of the p SNPs.
 
     """
-    # Convert x to int
-    x = x.astype(int)
 
     # Load parameter estimates from fastPhase output files
-    r = _loadEMParameters(r_file)
-    theta = np.matrix(_loadEMParameters(theta_file)).T
-    alpha = np.matrix(_loadEMParameters(alpha_file)).T
+    r = _loadEMParameters(r_file).astype(float)
+    theta = np.matrix(_loadEMParameters(theta_file).astype(float))
+    alpha = np.matrix(_loadEMParameters(alpha_file).astype(float))
+    origchars = _loadEMParameters(char_file)
 
     # Swap theta according to the correct definition based on the minor allele
-    X_chr_flip = np.array(x>0).flatten()
-    theta[:,X_chr_flip] = 1-theta[:,X_chr_flip]
+    X_chr_flip = np.isin(origchars[:,1], ["1?", "10"])
+    theta[X_chr_flip,:] = 1-theta[X_chr_flip,:]
 
-    # Assemble the HMM variables according to the model assumed by fastPhase
-    K,_ = theta.shape
-    Q1 = _computeQ1(r, alpha)
-    Q = _assembleQ(Q1)
-    pInit = _assemblePInit(alpha)
-    pEmit = _assembleEmissionP(theta)
+    if(compact):
+       result = {'r':np.array(r), 'alpha':np.array(alpha), 'theta':np.array(theta)}
 
-    return {'pInit': pInit, 'Q':Q, 'pEmit':pEmit}
+    else:
+       # Assemble the HMM variables according to the model assumed by fastPhase
+       K,_ = theta.shape
+       Q1 = _computeQ1(r, alpha)
+       Q = _assembleQ(Q1)
+       pInit = _assemblePInit(alpha)
+       pEmit = _assembleEmissionP(theta)
+       result = {'pInit':pInit, 'Q':Q, 'pEmit':pEmit}
+       
+    return result
 
 def _loadEMParameters(filepath):
     """
@@ -106,8 +108,10 @@ def _loadEMParameters(filepath):
     """
     # Read parameter estimate file produced by fastPhase
     # Keep only estimates from the first EM start, if multiple starts are present
+    
     num_EM = sum(line[0]=='>' for line in open(filepath))      # Count number of EM starts
-    paramHat = np.loadtxt(filepath, comments='>')              # Load parameter estimates
+    num_EM = np.maximum(1, num_EM)
+    paramHat = np.loadtxt(filepath, dtype='str', comments='>', skiprows=1)  # Load parameter estimates
     keep_rows = range(int(paramHat.shape[0]/num_EM))
     if len(paramHat.shape)==1:
         paramHat = paramHat[keep_rows]
@@ -120,11 +124,11 @@ def _computeQ1(r, alpha):
     .. document private functions
     """
     # Compute the transition matrix for a single haplotype
-    K,p = alpha.shape
+    p,K = alpha.shape
     Q = np.zeros((p-1,K,K))
     rExp = np.exp(-r)
     for j in range(1,p):
-        Q1 = np.repeat( (1-rExp[j])*alpha[:,j].T, K, 0)
+        Q1 = np.repeat( (1-rExp[j])*alpha[j,:], K, 0)
         Q1[np.diag_indices(K)] += rExp[j]
         Q[j-1,:,:] = Q1
     return Q
@@ -159,7 +163,7 @@ def _assembleEmissionP(theta):
     .. document private functions
     """
     # Compute the emission probabilities
-    K,p = theta.shape
+    p,K = theta.shape
     Keff = int(K*(K+1)/2)
     pEmit = np.zeros((p,3,Keff))
     for m in range(p):
@@ -167,9 +171,9 @@ def _assembleEmissionP(theta):
         for k1 in range(K):
             for k2 in range(k1+1):
                 i = int(((k1+1)*k1)/2+k2)
-                pEmit1[0,i] = (1-theta[k1,m])*(1-theta[k2,m])
-                pEmit1[1,i] = theta[k1,m]*(1-theta[k2,m]) + theta[k2,m]*(1-theta[k1,m])
-                pEmit1[2,i] = theta[k1,m]*theta[k2,m]
+                pEmit1[0,i] = (1-theta[m,k1])*(1-theta[m,k2])
+                pEmit1[1,i] = theta[m,k1]*(1-theta[m,k2]) + theta[m,k2]*(1-theta[m,k1])
+                pEmit1[2,i] = theta[m,k1]*theta[m,k2]
 #               if abs(np.sum(pEmit1[:,i])-1)>1e-6:
 #                   raise ValueError('Warning: incorrect normalization of emission probabilities! Perhaps a numerical error in fastPhase?')
                 pEmit1[:,i] /= np.sum(pEmit1[:,i]) # Normalize to compensate for numerical errors
@@ -181,21 +185,21 @@ def _assemblePInit(alpha):
     .. document private functions
     """
     # Compute the marginal distribution for the first SNP
-    K,p = alpha.shape
+    p,K = alpha.shape
     pInit = np.zeros((int(K*(K+1)/2),))
     for k1 in range(K):
         for k2 in range(k1+1):
             i = int(((k1+1)*k1)/2+k2)
             if (k1==k2):
-                pInit[i] = alpha[k1,0]*alpha[k1,0]
+                pInit[i] = alpha[0,k1]*alpha[0,k1]
             else:
-                pInit[i] = 2*alpha[k1,0]*alpha[k2,0]
+                pInit[i] = 2*alpha[0,k1]*alpha[0,k2]
 #    if abs(np.sum(pInit)-1)>1e-4:
 #       raise ValueError('Warning: incorrect normalization of initial probabilities! Perhaps a numerical error in fastPhase?')
     pInit /= np.sum(pInit)  # Normalize to compensate for numerical errors
     return pInit
 
-def writeX(X, out_file):
+def writeXtoInp(X, out_file):
     '''
     Convert the genotype data matrix X (consisting of 0,1 and 2's) into the fastPhase
     input format and saves it to a text file. This script assumes that there are no
