@@ -1,6 +1,6 @@
 # This file is part of SNPknock.
 #
-#     Copyright (C) 2017 Matteo Sesia
+#     Copyright (C) 2017-2019 Matteo Sesia
 #
 #     SNPknock is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
@@ -17,25 +17,77 @@
 
 import numpy as np
 import os
+import distutils.spawn
 import pdb # debug
 
-def runFastPhase(fp_path, X_file, out_path, K=12, numit=25, seed=1):
+def writeXtoInp(X, out_file, phased=False):
+    '''
+    Convert the genotype data matrix X (consisting of 0,1 and 2's) into the fastPhase
+    input format and saves it to a text file. This script assumes that there are no
+    missing values in X.
+    For more information about the fastPhase format see: http://scheet.org/software.html
+
+    :param X: a numpy array of size (n,p), where n is the number of individuals and p
+              is the number of SNPs. If X is phased, the array is assumed to have size (2n,p).
+    :param out_file: a string containing the path of the output file onto which X
+                     will be written.
+    :param phased: whether the input describes phased haplotypes (default: False).
+    '''
+
+    # Convert X to integer
+    n,p = X.shape
+    X = X.astype(int)
+
+    if(phased==True):
+        assert n % 2 == 0, "X contains an odd number of rows, which is not consistent with phased haplotypes"
+
+    if(phased==True):
+        # Separate the phases
+        n = int(n/2)
+        Xp1 = X[np.arange(0,2*n,2),:]
+        Xp2 = X[np.arange(1,2*n,2),:]
+    else:
+        # Random phasing
+        Xt = X.T
+        v1 = np.array([0,1,1])
+        v2 = np.array([0,0,1])
+        Xp1 = v1[Xt].T
+        Xp2 = v2[Xt].T
+
+    # Create output file
+    out_f = open(out_file, 'w')
+
+    # Write initial lines with number of individuals and number of sites
+    out_f.write('{0:1d}\n'.format(n))
+    out_f.write('{0:1d}\n'.format(p))
+
+    # Write the genotype of each individual
+    for i in range(n):
+        out_f.write('#id{0:1d}\n'.format(i))
+        out_f.write(''.join(map(str, Xp1[i,:]))+'\n')
+        out_f.write(''.join(map(str, Xp2[i,:]))+'\n')
+
+    # Close output file
+    out_f.close()
+
+def runFastPhase(X_file, out_path, fastphase="fastphase", phased=False, K=12, numit=25, seed=1):
     """
     This function calls fastPhase to fit an HMM to the genotype data. FastPhase will fit the HMM
     to the genotype data and write the corresponding parameter estimates in three separate
     files named:
-       * out_path + "_rhat.txt"
-       * out_path + "_alphahat.txt"
-       * out_path + "_thetahat.txt"
+    * out_path + "_rhat.txt"
+    * out_path + "_alphahat.txt"
+    * out_path + "_thetahat.txt"
 
     The HMM for the genotype data can then be loaded from this files using
     :meth:`SNPknock.fastphase.loadFit`.
 
-    :param fp_path: a string with the path to the directory with the fastPhase executable.
     :param X_file: a string with the path of the genotype input file containing X in fastPhase
-                   format (as created by :meth:`SNPknock.fastphase.writeX`).
+                   format (as created by :meth:`SNPknock.fastphase.writeXtoInp`).
     :param out_path: a string with the path of the directory in which the parameter estimates
                      will be saved.
+    :param fastphase: a string with the path to the directory with the fastPhase executable (default: "fastphase").
+    :param phased: whether the input describes phased haplotypes (default: False).
     :param K: the number of hidden states for each haplotype sequence (default: 12).
     :param numit: the number of EM iterations (default: 25).
     :param seed: the random seed for the EM algorithm (default: 1).
@@ -43,38 +95,41 @@ def runFastPhase(fp_path, X_file, out_path, K=12, numit=25, seed=1):
     """
 
     # Verify that the fastPhase executable can be found
-    fp_path = os.path.abspath(fp_path)
-    assert os.path.isfile(fp_path), "Could not find fastPhase executable.\nFile %s does not exist" %fp_path
-    assert os.access(fp_path, os.X_OK), "Could not call fastPhase.\nFile %s is not executable" %fp_path
+    fp_path = distutils.spawn.find_executable(fastphase)
+    assert os.path.isfile(fp_path), "Could not find fastPhase executable.\n %s does not exist" %fastphase
 
     # Prepare arguments for fastPhase
     command = fp_path
     command += " -Pp -T1 -K" + str(K)
     command += " -g -H-4 -C" + str(numit)
+    if(phased==True):
+        command += " -B"
     command += " -S" + str(seed)
     command += " -o'" + out_path + "' " + X_file
 
     # Call fastPhase
     os.system(command)
 
-def loadHMM(r_file, theta_file, alpha_file, char_file, compact=True, phased=False):
+def loadHMM(r_file, alpha_file, theta_file, char_file, compact=True, phased=False):
     """
     Load the parameter estimates obtained by fastPhase and assembles the HMM model
     for the genotype data. For more information about fastPhase format see:
     http://scheet.org/software.html
 
     :param r_file: a string with the path of the "_rhat.txt" file produced by fastPhase.
-    :param theta_file: a string with the path of the "_thetahat.txt" file produced by fastPhase.
     :param alpha_file: a string with the path of the "_alphahat.txt" file produced by fastPhase.
+    :param theta_file: a string with the path of the "_thetahat.txt" file produced by fastPhase.
     :param char_file: a string with the path of the "_origchars" file produced by fastPhase.
-    :returns: a dictionary {'Q','pInit','pEmit'} where
+    :param compact: whether to return a compact representation of the HMM (r,alpha,theta). (default: True).
+    :param phased: whether the non-compact representation of the HMM should describe phased haplotypes (default: False).
+    :returns: a dictionary {'Q','pInit','pEmit'} where:
 
-        - Q is a numpy array of size (p-1,K,K), containing a list of p-1 transition matrices
-          between the K latent states of the HMM.
-        - pInit is a numpy array of length K, containing the marginal distribution of the hidden
-          states for the first SNP.
-        - pEmit is a numpy array of size (p,K,3), containing the emission probabilities of
-          the hidden states for each of the p SNPs.
+    - Q is a numpy array of size (p-1,K,K), containing a list of p-1 transition matrices
+      between the K latent states of the HMM.
+    - pInit is a numpy array of length K, containing the marginal distribution of the hidden
+      states for the first SNP.
+    - pEmit is a numpy array of size (p,K,3), containing the emission probabilities of
+      the hidden states for each of the p SNPs.
 
     """
 
@@ -90,16 +145,19 @@ def loadHMM(r_file, theta_file, alpha_file, char_file, compact=True, phased=Fals
 
     if(compact):
        result = {'r':np.array(r), 'alpha':np.array(alpha), 'theta':np.array(theta)}
-
     else:
-       # Assemble the HMM variables according to the model assumed by fastPhase
-       K,_ = theta.shape
-       Q1 = _computeQ1(r, alpha)
-       Q = _assembleQ(Q1)
-       pInit = _assemblePInit(alpha)
-       pEmit = _assembleEmissionP(theta)
-       result = {'pInit':pInit, 'Q':Q, 'pEmit':pEmit}
-       
+        # Assemble the HMM variables according to the model assumed by fastPhase
+        Q1 = _computeQ1(r, alpha)
+        if(phased==True):
+            Q = Q1
+            pInit = _assemblePInit_phased(alpha)
+            pEmit = _assembleEmissionP_phased(theta)
+        else:
+            Q = _assembleQ(Q1)
+            pInit = _assemblePInit(alpha)
+            pEmit = _assembleEmissionP(theta)
+        result = {'pInit':pInit, 'Q':Q, 'pEmit':pEmit}
+
     return result
 
 def _loadEMParameters(filepath):
@@ -108,7 +166,7 @@ def _loadEMParameters(filepath):
     """
     # Read parameter estimate file produced by fastPhase
     # Keep only estimates from the first EM start, if multiple starts are present
-    
+
     num_EM = sum(line[0]=='>' for line in open(filepath))      # Count number of EM starts
     num_EM = np.maximum(1, num_EM)
     paramHat = np.loadtxt(filepath, dtype='str', comments='>', skiprows=1)  # Load parameter estimates
@@ -158,6 +216,18 @@ def _assembleQ(Q1):
         Q[m] /= row_sums[:,None]
     return Q
 
+def _assembleEmissionP_phased(theta):
+    """
+    .. document private functions
+    """
+    # Compute the emission probabilities
+    p,K = theta.shape
+    pEmit = np.zeros((p,2,K))
+    for m in range(p):
+        pEmit[m,0,:] = 1.0-theta[m,:]
+        pEmit[m,1,:] = theta[m,:]
+    return pEmit
+
 def _assembleEmissionP(theta):
     """
     .. document private functions
@@ -180,6 +250,16 @@ def _assembleEmissionP(theta):
         pEmit[m,:,:] = np.matrix(pEmit1)
     return pEmit
 
+def _assemblePInit_phased(alpha):
+    """
+    .. document private functions
+    """
+    # Compute the marginal distribution for the first SNP
+    p,K = alpha.shape
+    pInit = alpha[0,:]
+    pInit /= np.sum(pInit)
+    return pInit
+
 def _assemblePInit(alpha):
     """
     .. document private functions
@@ -198,42 +278,3 @@ def _assemblePInit(alpha):
 #       raise ValueError('Warning: incorrect normalization of initial probabilities! Perhaps a numerical error in fastPhase?')
     pInit /= np.sum(pInit)  # Normalize to compensate for numerical errors
     return pInit
-
-def writeXtoInp(X, out_file):
-    '''
-    Convert the genotype data matrix X (consisting of 0,1 and 2's) into the fastPhase
-    input format and saves it to a text file. This script assumes that there are no
-    missing values in X.
-    For more information about the fastPhase format see: http://scheet.org/software.html
-
-    :param X: a numpy array of size (n,p), where n is the number of individuals and p
-              is the number of SNPs.
-    :param out_file: a string containing the path of the output file onto which X
-                     will be written.
-
-    '''
-    # Transpose X and convert it to int
-    X = X.T.astype(int)
-
-    # Create the two matrices of covariates for fastPhase (i.e. random phasing)
-    v1 = np.array([0,1,1])
-    v2 = np.array([0,0,1])
-    Xp1 = v1[X]
-    Xp2 = v2[X]
-
-    # Create output file
-    out_f = open(out_file, 'w')
-
-    # Write initial lines with number of individuals and number of sites
-    p,n = X.shape
-    out_f.write('{0:1d}\n'.format(n))
-    out_f.write('{0:1d}\n'.format(p))
-
-    # Write the genotype of each individual
-    for i in range(n):
-        out_f.write('#id{0:1d}\n'.format(i))
-        out_f.write(''.join(map(str, Xp1[:,i]))+'\n')
-        out_f.write(''.join(map(str, Xp2[:,i]))+'\n')
-
-    # Close output file
-    out_f.close()

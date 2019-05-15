@@ -1,7 +1,7 @@
 /*
   This file is part of SNPknock.
 
-    Copyright (C) 2017 Matteo Sesia
+    Copyright (C) 2017-2019 Matteo Sesia
 
     SNPknock is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

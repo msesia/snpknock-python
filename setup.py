@@ -79,7 +79,7 @@ def main(**extra_args):
           author="Matteo Sesia",
           author_email="msesia@stanford.edu",
           platforms="OS Independent",
-          version='0.5.2',
+          version='0.8',
           requires=REQUIRES,
           provides=["SNPknock"],
           packages     = ['SNPknock',

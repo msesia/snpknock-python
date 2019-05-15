@@ -1,6 +1,6 @@
 # This file is part of SNPknock.
 #
-#     Copyright (C) 2017 Matteo Sesia
+#     Copyright (C) 2017-2019 Matteo Sesia
 #
 #     SNPknock is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
@@ -67,12 +67,14 @@ cdef class knockoffDMC:
                   states for the first variable.
     :param Q: a numpy array of size (p-1,K,K), containing a list of p-1 transition matrices
               between the K states of the Markov chain.
+    :param groups: a numpy array of length p, describing the group membership of each variable (default: [1,2,...,p]).
     :param seed: an integer random seed (default: 123).
 
     """
     cdef KnockoffDMC *thisptr      # hold a C++ instance which we're wrapping
     cdef vector[double] pInit
     cdef vector[vector[vector[double]]] Q
+    cdef vector[int] groups
     cdef int seed
     def __cinit__(self, pInit, Q, groups=None, seed=123):
         if(groups is None):
@@ -119,6 +121,7 @@ cdef class knockoffHMM:
     :param pEmit: a numpy array of size (p,M,K), containing the emission probabilities for
                   each of the M possible emission states, from each of the K hidden states
                   and the p variables.
+    :param groups: a numpy array of length p, describing the group membership of each variable (default: [1,2,...,p]).
     :param seed: an integer random seed (default: 123).
 
     """
@@ -126,6 +129,7 @@ cdef class knockoffHMM:
     cdef vector[double] pInit
     cdef vector[vector[vector[double]]] Q
     cdef vector[vector[vector[double]]] pEmit
+    cdef vector[int] groups
     cdef int seed
     def __cinit__(self, pInit, Q, pEmit, groups=None, seed=123):
         if(groups is None):
@@ -173,6 +177,7 @@ cdef class knockoffGenotypes:
     :param pEmit: a numpy array of size (p,M,K), containing the emission probabilities for
                   each of the M possible emission states, from each of the K hidden states
                   and the p variables.
+    :param groups: a numpy array of length p, describing the group membership of each variable (default: [1,2,...,p]).
     :param seed: an integer random seed (default: 123).
 
     """
@@ -180,17 +185,12 @@ cdef class knockoffGenotypes:
     cdef vector[double] r
     cdef vector[vector[double]] alpha
     cdef vector[vector[double]] theta
+    cdef vector[int] groups
     cdef int seed
     def __cinit__(self, r, alpha, theta, groups=None, seed=123):
         if(groups is None):
             p = alpha.shape[0]
             groups = np.arange(p)
-        print(r.shape)
-        print(p)
-        print(alpha.shape)
-        print(theta.shape)
-        print(groups.shape)
-        print(seed)
         self.thisptr = new KnockoffGenotypes(r, alpha, theta, groups, seed)
         self.r = r
         self.alpha = alpha
@@ -233,6 +233,7 @@ cdef class knockoffHaplotypes:
     :param pEmit: a numpy array of size (p,M,K), containing the emission probabilities for
                   each of the M possible emission states, from each of the K hidden states
                   and the p variables.
+    :param groups: a numpy array of length p, describing the group membership of each variable (default: [1,2,...,p]).
     :param seed: an integer random seed (default: 123).
 
     """
@@ -240,17 +241,12 @@ cdef class knockoffHaplotypes:
     cdef vector[double] r
     cdef vector[vector[double]] alpha
     cdef vector[vector[double]] theta
+    cdef vector[int] groups
     cdef int seed
     def __cinit__(self, r, alpha, theta, groups=None, seed=123):
         if(groups is None):
             p = alpha.shape[0]
             groups = np.arange(p)
-        print(r.shape)
-        print(p)
-        print(alpha.shape)
-        print(theta.shape)
-        print(groups.shape)
-        print(seed)
         self.thisptr = new KnockoffHaplotypes(r, alpha, theta, groups, seed)
         self.r = r
         self.alpha = alpha
