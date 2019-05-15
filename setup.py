@@ -89,7 +89,9 @@ def main(**extra_args):
           data_files=[],
           scripts= [],
           long_description = open('README.rst', 'rt').read(),
-          install_requires = DEPENDENCIES
+          install_requires = DEPENDENCIES,
+          test_suite='nose.collector',
+          tests_require=['nose'],
     )
 
 #simple way to test what setup will do
