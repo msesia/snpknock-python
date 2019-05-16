@@ -1,0 +1,451 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>SNPknock package reference &#8212; SNPknock 0.8.2 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.8.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SNPknock 0.8.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="snpknock-package-reference">
+<h1>SNPknock package reference<a class="headerlink" href="#snpknock-package-reference" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-SNPknock">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-SNPknock" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="SNPknock.knockoffDMC">
+<em class="property">class </em><code class="descclassname">SNPknock.</code><code class="descname">knockoffDMC</code><a class="headerlink" href="#SNPknock.knockoffDMC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Class for knockoffs of a discrete Markov chain.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pInit</strong> – a numpy array of length K, containing the marginal distribution of the
+states for the first variable.</li>
+<li><strong>Q</strong> – a numpy array of size (p-1,K,K), containing a list of p-1 transition matrices
+between the K states of the Markov chain.</li>
+<li><strong>groups</strong> – a numpy array of length p, describing the group membership of each variable (default: [1,2,…,p]).</li>
+<li><strong>seed</strong> – an integer random seed (default: 123).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="SNPknock.knockoffDMC.sample">
+<code class="descname">sample</code><span class="sig-paren">(</span><em>self</em>, <em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#SNPknock.knockoffDMC.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample a knockoff copy of each row of X.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>X</strong> – a numpy array of size (n,p), where n is the number of individuals and p
+is the number of variables, containing the original Markov chain variables.
+The entries of X must be integers ranging from 0 to K-1, where K is the
+number of possible states of the Markov chain.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a numpy array of size (n,p), containing a knockoff copy of X.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="SNPknock.knockoffHMM">
+<em class="property">class </em><code class="descclassname">SNPknock.</code><code class="descname">knockoffHMM</code><a class="headerlink" href="#SNPknock.knockoffHMM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Class for knockoffs of a hidden Markov model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pInit</strong> – a numpy array of length K, containing the marginal distribution of the hidden
+states for the first variable.</li>
+<li><strong>Q</strong> – a numpy array of size (p-1,K,K), containing a list of p-1 transition matrices
+between the K latent states of the HMM.</li>
+<li><strong>pEmit</strong> – a numpy array of size (p,M,K), containing the emission probabilities for
+each of the M possible emission states, from each of the K hidden states
+and the p variables.</li>
+<li><strong>groups</strong> – a numpy array of length p, describing the group membership of each variable (default: [1,2,…,p]).</li>
+<li><strong>seed</strong> – an integer random seed (default: 123).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="SNPknock.knockoffHMM.sample">
+<code class="descname">sample</code><span class="sig-paren">(</span><em>self</em>, <em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#SNPknock.knockoffHMM.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Samples a knockoff copy of each row of X.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>X</strong> – a numpy array of size (n,p), where n is the number of individuals and p
+is the number of variables, containing the original HMM variables
+The entries of X must be integers ranging from 0 to M-1, where M is the
+number of possible emission states of the HMM.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a numpy array of size (n,p), containing a knockoff copy of X.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="SNPknock.knockoffGenotypes">
+<em class="property">class </em><code class="descclassname">SNPknock.</code><code class="descname">knockoffGenotypes</code><a class="headerlink" href="#SNPknock.knockoffGenotypes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Class for knockoffs of a hidden Markov model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pInit</strong> – a numpy array of length K, containing the marginal distribution of the hidden
+states for the first variable.</li>
+<li><strong>Q</strong> – a numpy array of size (p-1,K,K), containing a list of p-1 transition matrices
+between the K latent states of the Genotypes.</li>
+<li><strong>pEmit</strong> – a numpy array of size (p,M,K), containing the emission probabilities for
+each of the M possible emission states, from each of the K hidden states
+and the p variables.</li>
+<li><strong>groups</strong> – a numpy array of length p, describing the group membership of each variable (default: [1,2,…,p]).</li>
+<li><strong>seed</strong> – an integer random seed (default: 123).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="SNPknock.knockoffGenotypes.sample">
+<code class="descname">sample</code><span class="sig-paren">(</span><em>self</em>, <em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#SNPknock.knockoffGenotypes.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Samples a knockoff copy of each row of X.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>X</strong> – a numpy array of size (n,p), where n is the number of individuals and p
+is the number of variables, containing the original Genotypes variables
+The entries of X must be integers ranging from 0 to M-1, where M is the
+number of possible emission states of the Genotypes.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a numpy array of size (n,p), containing a knockoff copy of X.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="SNPknock.knockoffHaplotypes">
+<em class="property">class </em><code class="descclassname">SNPknock.</code><code class="descname">knockoffHaplotypes</code><a class="headerlink" href="#SNPknock.knockoffHaplotypes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Class for knockoffs of a hidden Markov model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pInit</strong> – a numpy array of length K, containing the marginal distribution of the hidden
+states for the first variable.</li>
+<li><strong>Q</strong> – a numpy array of size (p-1,K,K), containing a list of p-1 transition matrices
+between the K latent states of the Haplotypes.</li>
+<li><strong>pEmit</strong> – a numpy array of size (p,M,K), containing the emission probabilities for
+each of the M possible emission states, from each of the K hidden states
+and the p variables.</li>
+<li><strong>groups</strong> – a numpy array of length p, describing the group membership of each variable (default: [1,2,…,p]).</li>
+<li><strong>seed</strong> – an integer random seed (default: 123).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="SNPknock.knockoffHaplotypes.sample">
+<code class="descname">sample</code><span class="sig-paren">(</span><em>self</em>, <em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#SNPknock.knockoffHaplotypes.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Samples a knockoff copy of each row of X.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>X</strong> – a numpy array of size (n,p), where n is the number of individuals and p
+is the number of variables, containing the original Haplotypes variables
+The entries of X must be integers ranging from 0 to M-1, where M is the
+number of possible emission states of the Haplotypes.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a numpy array of size (n,p), containing a knockoff copy of X.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-SNPknock.fastphase">
+<span id="snpknock-fastphase-module"></span><h2>SNPknock.fastphase module<a class="headerlink" href="#module-SNPknock.fastphase" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="SNPknock.fastphase.loadHMM">
+<code class="descclassname">SNPknock.fastphase.</code><code class="descname">loadHMM</code><span class="sig-paren">(</span><em>r_file</em>, <em>alpha_file</em>, <em>theta_file</em>, <em>char_file</em>, <em>compact=True</em>, <em>phased=False</em><span class="sig-paren">)</span><a class="headerlink" href="#SNPknock.fastphase.loadHMM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the parameter estimates obtained by fastPhase and assembles the HMM model
+for the genotype data. For more information about fastPhase format see:
+<a class="reference external" href="http://scheet.org/software.html">http://scheet.org/software.html</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>r_file</strong> – a string with the path of the “_rhat.txt” file produced by fastPhase.</li>
+<li><strong>alpha_file</strong> – a string with the path of the “_alphahat.txt” file produced by fastPhase.</li>
+<li><strong>theta_file</strong> – a string with the path of the “_thetahat.txt” file produced by fastPhase.</li>
+<li><strong>char_file</strong> – a string with the path of the “_origchars” file produced by fastPhase.</li>
+<li><strong>compact</strong> – whether to return a compact representation of the HMM (r,alpha,theta). (default: True).</li>
+<li><strong>phased</strong> – whether the non-compact representation of the HMM should describe phased haplotypes (default: False).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a dictionary {‘Q’,’pInit’,’pEmit’} where:</p>
+</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li>Q is a numpy array of size (p-1,K,K), containing a list of p-1 transition matrices
+between the K latent states of the HMM.</li>
+<li>pInit is a numpy array of length K, containing the marginal distribution of the hidden
+states for the first SNP.</li>
+<li>pEmit is a numpy array of size (p,K,3), containing the emission probabilities of
+the hidden states for each of the p SNPs.</li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="SNPknock.fastphase.runFastPhase">
+<code class="descclassname">SNPknock.fastphase.</code><code class="descname">runFastPhase</code><span class="sig-paren">(</span><em>X_file</em>, <em>out_path</em>, <em>fastphase='fastphase'</em>, <em>phased=False</em>, <em>K=12</em>, <em>numit=25</em>, <em>seed=1</em><span class="sig-paren">)</span><a class="headerlink" href="#SNPknock.fastphase.runFastPhase" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calls fastPhase to fit an HMM to the genotype data. FastPhase will fit the HMM
+to the genotype data and write the corresponding parameter estimates in three separate
+files named:
+* out_path + “_rhat.txt”
+* out_path + “_alphahat.txt”
+* out_path + “_thetahat.txt”</p>
+<p>The HMM for the genotype data can then be loaded from this files using
+<code class="xref py py-meth docutils literal"><span class="pre">SNPknock.fastphase.loadFit()</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>X_file</strong> – a string with the path of the genotype input file containing X in fastPhase
+format (as created by <a class="reference internal" href="#SNPknock.fastphase.writeXtoInp" title="SNPknock.fastphase.writeXtoInp"><code class="xref py py-meth docutils literal"><span class="pre">SNPknock.fastphase.writeXtoInp()</span></code></a>).</li>
+<li><strong>out_path</strong> – a string with the path of the directory in which the parameter estimates
+will be saved.</li>
+<li><strong>fastphase</strong> – a string with the path to the directory with the fastPhase executable (default: “fastphase”).</li>
+<li><strong>phased</strong> – whether the input describes phased haplotypes (default: False).</li>
+<li><strong>K</strong> – the number of hidden states for each haplotype sequence (default: 12).</li>
+<li><strong>numit</strong> – the number of EM iterations (default: 25).</li>
+<li><strong>seed</strong> – the random seed for the EM algorithm (default: 1).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="SNPknock.fastphase.writeXtoInp">
+<code class="descclassname">SNPknock.fastphase.</code><code class="descname">writeXtoInp</code><span class="sig-paren">(</span><em>X</em>, <em>out_file</em>, <em>phased=False</em><span class="sig-paren">)</span><a class="headerlink" href="#SNPknock.fastphase.writeXtoInp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the genotype data matrix X (consisting of 0,1 and 2’s) into the fastPhase
+input format and saves it to a text file. This script assumes that there are no
+missing values in X.
+For more information about the fastPhase format see: <a class="reference external" href="http://scheet.org/software.html">http://scheet.org/software.html</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>X</strong> – a numpy array of size (n,p), where n is the number of individuals and p
+is the number of SNPs. If X is phased, the array is assumed to have size (2n,p).</li>
+<li><strong>out_file</strong> – a string containing the path of the output file onto which X
+will be written.</li>
+<li><strong>phased</strong> – whether the input describes phased haplotypes (default: False).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-SNPknock.models">
+<span id="snpknock-models-module"></span><h2>SNPknock.models module<a class="headerlink" href="#module-SNPknock.models" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="SNPknock.models.DMC">
+<em class="property">class </em><code class="descclassname">SNPknock.models.</code><code class="descname">DMC</code><span class="sig-paren">(</span><em>pInit</em>, <em>Q</em><span class="sig-paren">)</span><a class="headerlink" href="#SNPknock.models.DMC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Discrete Markov chain model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pInit</strong> – a numpy array of length K, containing the marginal distribution of the
+first variable in the chain.</li>
+<li><strong>Q</strong> – a numpy array of size (p,K,K), containing a list of p-1 transition matrices
+between the K states of the Markov chain.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="SNPknock.models.DMC.sample">
+<code class="descname">sample</code><span class="sig-paren">(</span><em>n=1</em><span class="sig-paren">)</span><a class="headerlink" href="#SNPknock.models.DMC.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample the observations from their marginal distribution.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n</strong> – the number of observations to be sampled (default: 1).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a numpy matrix of size (n,p).</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="SNPknock.models.HMM">
+<em class="property">class </em><code class="descclassname">SNPknock.models.</code><code class="descname">HMM</code><span class="sig-paren">(</span><em>pInit</em>, <em>Q</em>, <em>pEmit</em><span class="sig-paren">)</span><a class="headerlink" href="#SNPknock.models.HMM" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>Hidden Markov model with a discrete emission distribution.</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pInit</strong> – a numpy array of length K, containing the marginal distribution of the hidden
+states for the first variable.</li>
+<li><strong>Q</strong> – a numpy array of size (p,K,K), containing a list of p-1 transition matrices
+between the K latent states of the hidden Markov model.</li>
+<li><strong>pEmit</strong> – a numpy array of size (p,M,K), containing the emission probabilities for
+each of the M possible emission states, from each of the K hidden states
+and the p variables.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="SNPknock.models.HMM.sample">
+<code class="descname">sample</code><span class="sig-paren">(</span><em>n=1</em><span class="sig-paren">)</span><a class="headerlink" href="#SNPknock.models.HMM.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample the n observations of the hidden Markov model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n</strong> – the number of observations to be sampled (default: 1).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a numpy matrix of size (n,p).</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">SNPknock package reference</a><ul>
+<li><a class="reference internal" href="#module-SNPknock">Module contents</a></li>
+<li><a class="reference internal" href="#module-SNPknock.fastphase">SNPknock.fastphase module</a></li>
+<li><a class="reference internal" href="#module-SNPknock.models">SNPknock.models module</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SNPknock 0.8.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2019, Matteo Sesia.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.4.
+    </div>
+  </body>
+</html>

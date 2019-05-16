@@ -1,0 +1,349 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Tutorial &#8212; SNPknock 0.8.2 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.8.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SNPknock 0.8.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tutorial">
+<h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
+<p>This page contains examples of how to use SNPknock.</p>
+<div class="section" id="verify-installation">
+<h2>Verify installation<a class="headerlink" href="#verify-installation" title="Permalink to this headline">¶</a></h2>
+<p>To get started, we verify that SNPknock was installed correctly.</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">SNPknock</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">SNPknock</span><span class="o">.</span><span class="n">__version__</span>
+<span class="go">0.8</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="knockoffs-of-a-discrete-markov-chain">
+<h2>Knockoffs of a discrete Markov chain<a class="headerlink" href="#knockoffs-of-a-discrete-markov-chain" title="Permalink to this headline">¶</a></h2>
+<p>First, let us define a discrete Markov chain (DMC) using the <cite>models</cite> subpackage from SNPknock</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span> <span class="c1"># Make this examples replicable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="mi">50</span> <span class="c1"># Number of variables</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">K</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># Number of states</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">K</span><span class="p">,</span><span class="n">K</span><span class="p">))</span> <span class="c1"># Transition matrices</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+<span class="gp">... </span>   <span class="n">Q</span><span class="p">[</span><span class="n">j</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">K</span><span class="o">*</span><span class="n">K</span><span class="p">),(</span><span class="n">K</span><span class="p">,</span><span class="n">K</span><span class="p">))</span>
+<span class="gp">... </span>   <span class="n">Q</span><span class="p">[</span><span class="n">j</span><span class="p">,:,:]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mi">10</span><span class="p">]</span><span class="o">*</span><span class="n">K</span><span class="p">)</span>
+<span class="gp">... </span>   <span class="n">Q</span><span class="p">[</span><span class="n">j</span><span class="p">,:,:]</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Q</span><span class="p">[</span><span class="n">j</span><span class="p">,:,:],</span><span class="mi">1</span><span class="p">)[:,</span><span class="bp">None</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pInit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="o">/</span><span class="n">K</span><span class="p">]</span><span class="o">*</span><span class="n">K</span><span class="p">)</span> <span class="c1"># Initial distribution</span>
+</pre></div>
+</div>
+<p>We create a synthetic data matrix X by drawing from the DMC defined above.</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">SNPknock</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">=</span><span class="mi">100</span> <span class="c1"># Number of samples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">modelX</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DMC</span><span class="p">(</span><span class="n">pInit</span><span class="p">,</span> <span class="n">Q</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">modelX</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="go">[[1 1 1 ... 1 1 1]</span>
+<span class="go"> [3 3 3 ... 1 1 1]</span>
+<span class="go"> [3 3 3 ... 3 3 3]</span>
+<span class="go"> ...</span>
+<span class="go"> [2 2 2 ... 1 1 1]</span>
+<span class="go"> [0 0 0 ... 2 3 3]</span>
+<span class="go"> [2 2 1 ... 3 3 1]]</span>
+</pre></div>
+</div>
+<p>Knockoffs can be sampled as follows.</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">SNPknock</span> <span class="kn">import</span> <span class="n">knockoffDMC</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">knockoffs</span> <span class="o">=</span> <span class="n">knockoffDMC</span><span class="p">(</span><span class="n">pInit</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Xk</span> <span class="o">=</span> <span class="n">knockoffs</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">Xk</span><span class="p">)</span>
+<span class="go">[[1 1 1 ... 1 1 1]</span>
+<span class="go"> [3 3 3 ... 2 1 1]</span>
+<span class="go"> [0 3 3 ... 3 3 3]</span>
+<span class="go"> ...</span>
+<span class="go"> [1 2 2 ... 1 1 1]</span>
+<span class="go"> [0 0 0 ... 3 3 3]</span>
+<span class="go"> [2 3 3 ... 3 3 3]]</span>
+</pre></div>
+</div>
+<p>Group-knockoffs can be sampled similarly.</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">groups</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">p</span><span class="p">),</span><span class="mi">3</span><span class="p">)[:</span><span class="n">p</span><span class="p">]</span> <span class="c1"># Group assignments (groups of size 3)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">knockoffs</span> <span class="o">=</span> <span class="n">knockoffDMC</span><span class="p">(</span><span class="n">pInit</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="n">groups</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Xk</span> <span class="o">=</span> <span class="n">knockoffs</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">Xk</span><span class="p">)</span>
+<span class="go">[[1 1 1 ... 1 1 1]</span>
+<span class="go"> [0 0 0 ... 1 1 1]</span>
+<span class="go"> [0 0 0 ... 3 3 3]</span>
+<span class="go"> ...</span>
+<span class="go"> [0 1 1 ... 1 1 1]</span>
+<span class="go"> [0 0 0 ... 3 3 3]</span>
+<span class="go"> [0 3 3 ... 3 3 3]]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="knockoffs-of-a-hidden-markov-model">
+<h2>Knockoffs of a hidden Markov model<a class="headerlink" href="#knockoffs-of-a-hidden-markov-model" title="Permalink to this headline">¶</a></h2>
+<p>We can define a hidden Markov model (HMM) using the <cite>models</cite> subpackage from SNPknock</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="mi">50</span> <span class="c1"># Number of variables</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">K</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># Number of latent states</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># Number of emission states</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">K</span><span class="p">,</span><span class="n">K</span><span class="p">))</span> <span class="c1"># Transition matrices</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+<span class="gp">... </span>   <span class="n">Q</span><span class="p">[</span><span class="n">j</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">K</span><span class="o">*</span><span class="n">K</span><span class="p">),(</span><span class="n">K</span><span class="p">,</span><span class="n">K</span><span class="p">))</span>
+<span class="gp">... </span>   <span class="n">Q</span><span class="p">[</span><span class="n">j</span><span class="p">,:,:]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mi">10</span><span class="p">]</span><span class="o">*</span><span class="n">K</span><span class="p">)</span>
+<span class="gp">... </span>   <span class="n">Q</span><span class="p">[</span><span class="n">j</span><span class="p">,:,:]</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Q</span><span class="p">[</span><span class="n">j</span><span class="p">,:,:],</span><span class="mi">1</span><span class="p">)[:,</span><span class="bp">None</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pEmit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">p</span><span class="p">,</span><span class="n">M</span><span class="p">,</span><span class="n">K</span><span class="p">))</span> <span class="c1"># Emission probabilities</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+<span class="gp">... </span>  <span class="n">pEmit</span><span class="p">[</span><span class="n">j</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">M</span><span class="o">*</span><span class="n">K</span><span class="p">),(</span><span class="n">M</span><span class="p">,</span><span class="n">K</span><span class="p">))</span>
+<span class="gp">... </span>  <span class="n">pEmit</span><span class="p">[</span><span class="n">j</span><span class="p">,:,:]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mi">10</span><span class="p">]</span><span class="o">*</span><span class="n">M</span><span class="p">),</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="n">K</span><span class="o">-</span><span class="n">M</span><span class="p">)),</span> <span class="s1">&#39;constant&#39;</span><span class="p">)</span>
+<span class="gp">... </span>  <span class="n">pEmit</span><span class="p">[</span><span class="n">j</span><span class="p">,:,:]</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pEmit</span><span class="p">[</span><span class="n">j</span><span class="p">,:,:],</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pInit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="o">/</span><span class="n">K</span><span class="p">]</span><span class="o">*</span><span class="n">K</span><span class="p">)</span> <span class="c1"># Initial distribution</span>
+</pre></div>
+</div>
+<p>Now, we create a synthetic data matrix X by drawing from the DMC defined above.</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">SNPknock</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">=</span><span class="mi">100</span> <span class="c1"># Number of samples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">modelX</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">HMM</span><span class="p">(</span><span class="n">pInit</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">pEmit</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">modelX</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="go">[[0 0 0 ... 0 1 2]</span>
+<span class="go"> [1 1 1 ... 1 1 1]</span>
+<span class="go"> [1 1 1 ... 2 2 0]</span>
+<span class="go"> ...</span>
+<span class="go"> [1 1 1 ... 0 2 2]</span>
+<span class="go"> [0 1 0 ... 1 1 0]</span>
+<span class="go"> [0 0 1 ... 2 2 2]]</span>
+</pre></div>
+</div>
+<p>Finally, we sample the knockoffs.</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">SNPknock</span> <span class="kn">import</span> <span class="n">knockoffHMM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">groups</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">p</span><span class="p">),</span><span class="mi">3</span><span class="p">)[:</span><span class="n">p</span><span class="p">]</span> <span class="c1"># Group assignments (groups of size 3)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">knockoffs</span> <span class="o">=</span> <span class="n">knockoffHMM</span><span class="p">(</span><span class="n">pInit</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">pEmit</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="n">groups</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Xk</span> <span class="o">=</span> <span class="n">knockoffs</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">Xk</span><span class="p">)</span>
+<span class="go">[[1 1 0 ... 2 2 2]</span>
+<span class="go"> [0 1 1 ... 1 1 2]</span>
+<span class="go"> [1 1 1 ... 2 2 2]</span>
+<span class="go"> ...</span>
+<span class="go"> [2 2 2 ... 0 2 2]</span>
+<span class="go"> [1 1 0 ... 2 1 0]</span>
+<span class="go"> [0 0 0 ... 2 2 2]]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="working-with-genotype-data">
+<h2>Working with genotype data<a class="headerlink" href="#working-with-genotype-data" title="Permalink to this headline">¶</a></h2>
+<p>In this section we show how to use SNPknock to create knockoffs
+of genotype data, using an HMM fitted with the imputation software
+<a class="reference external" href="http://stephenslab.uchicago.edu/software.html#fastphase">fastPhase</a>.
+The submodule <cite>fastphase</cite> of SNPknock contains a simple interface to
+the relevant features of the imputation software.</p>
+<p>We assume that our genotype data consists of a matrix <cite>X</cite> in the
+same format as in the HMM example above. Each row of <cite>X</cite> is a sequence
+of 0,1 and 2’s representing the genotype of an individual.
+In order to fit an HMM to this data using fastPhase, we first need to
+convert the matrix <cite>X</cite> into the appropriate input format. This can be
+easily done as follows.</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">SNPknock.fastphase</span> <span class="kn">as</span> <span class="nn">fp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Xfp_file</span> <span class="o">=</span> <span class="s1">&#39;tmp/X.inp&#39;</span> <span class="c1"># Temporary file that will be used as input for fastPhase</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fp</span><span class="o">.</span><span class="n">writeXtoInp</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Xfp_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Once we have created the input file for fastPhase, we can call
+execute the imputation software to fit the HMM.</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fastphase</span> <span class="o">=</span> <span class="s2">&quot;fastphase&quot;</span> <span class="c1"># Name of fastPhase executable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out_path</span> <span class="o">=</span> <span class="s2">&quot;tmp/example&quot;</span> <span class="c1"># Prefix to temporary output files produced by fastPhase</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fp</span><span class="o">.</span><span class="n">runFastPhase</span><span class="p">(</span><span class="n">Xfp_file</span><span class="p">,</span> <span class="n">out_path</span><span class="p">,</span> <span class="n">fastphase</span><span class="o">=</span><span class="n">fastphase</span><span class="p">,</span> <span class="n">K</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">numit</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We collect the parameter estimates obtained by fastPhase and use
+use them to define an HMM for knockoffs as follows.</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r_file</span>     <span class="o">=</span> <span class="n">out_path</span> <span class="o">+</span> <span class="s2">&quot;_rhat.txt&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha_file</span> <span class="o">=</span> <span class="n">out_path</span> <span class="o">+</span> <span class="s2">&quot;_alphahat.txt&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">theta_file</span> <span class="o">=</span> <span class="n">out_path</span> <span class="o">+</span> <span class="s2">&quot;_thetahat.txt&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">origchars_file</span> <span class="o">=</span> <span class="n">out_path</span> <span class="o">+</span> <span class="s2">&quot;_origchars&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hmm</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">loadHMM</span><span class="p">(</span><span class="n">r_file</span><span class="p">,</span> <span class="n">alpha_file</span><span class="p">,</span> <span class="n">theta_file</span><span class="p">,</span> <span class="n">origchars_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Finally, we sample the knockoffs.</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">SNPknock</span> <span class="kn">import</span> <span class="n">knockoffGenotypes</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">knockoffs</span> <span class="o">=</span> <span class="n">knockoffGenotypes</span><span class="p">(</span><span class="n">hmm</span><span class="p">[</span><span class="s2">&quot;r&quot;</span><span class="p">],</span> <span class="n">hmm</span><span class="p">[</span><span class="s2">&quot;alpha&quot;</span><span class="p">],</span> <span class="n">hmm</span><span class="p">[</span><span class="s2">&quot;theta&quot;</span><span class="p">],</span> <span class="n">seed</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Xk</span> <span class="o">=</span> <span class="n">knockoffs</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">Xk</span><span class="p">)</span>
+<span class="go">[[0 1 0 ... 0 0 1]</span>
+<span class="go"> [1 1 1 ... 1 1 2]</span>
+<span class="go"> [0 1 1 ... 1 2 1]</span>
+<span class="go"> ...</span>
+<span class="go"> [1 1 0 ... 0 2 2]</span>
+<span class="go"> [1 1 1 ... 1 1 0]</span>
+<span class="go"> [0 0 0 ... 1 2 1]]</span>
+</pre></div>
+</div>
+<p>Alternatively, we can use the general knockoff construction for HMMs.</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r_file</span>     <span class="o">=</span> <span class="n">out_path</span> <span class="o">+</span> <span class="s2">&quot;_rhat.txt&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha_file</span> <span class="o">=</span> <span class="n">out_path</span> <span class="o">+</span> <span class="s2">&quot;_alphahat.txt&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">theta_file</span> <span class="o">=</span> <span class="n">out_path</span> <span class="o">+</span> <span class="s2">&quot;_thetahat.txt&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">origchars_file</span> <span class="o">=</span> <span class="n">out_path</span> <span class="o">+</span> <span class="s2">&quot;_origchars&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hmm</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">loadHMM</span><span class="p">(</span><span class="n">r_file</span><span class="p">,</span> <span class="n">alpha_file</span><span class="p">,</span> <span class="n">theta_file</span><span class="p">,</span> <span class="n">origchars_file</span><span class="p">,</span> <span class="n">compact</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">knockoffs</span> <span class="o">=</span> <span class="n">knockoffHMM</span><span class="p">(</span><span class="n">hmm</span><span class="p">[</span><span class="s2">&quot;pInit&quot;</span><span class="p">],</span> <span class="n">hmm</span><span class="p">[</span><span class="s2">&quot;Q&quot;</span><span class="p">],</span> <span class="n">hmm</span><span class="p">[</span><span class="s2">&quot;pEmit&quot;</span><span class="p">],</span> <span class="n">seed</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Xk</span> <span class="o">=</span> <span class="n">knockoffs</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">Xk</span><span class="p">)</span>
+<span class="go">[[0 1 0 ... 0 0 1]</span>
+<span class="go"> [1 1 1 ... 1 1 2]</span>
+<span class="go"> [0 1 1 ... 1 2 1]</span>
+<span class="go"> ...</span>
+<span class="go"> [1 1 0 ... 0 2 2]</span>
+<span class="go"> [1 1 1 ... 1 1 0]</span>
+<span class="go"> [0 0 0 ... 1 2 1]]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="working-with-phased-haplotypes">
+<h2>Working with phased haplotypes<a class="headerlink" href="#working-with-phased-haplotypes" title="Permalink to this headline">¶</a></h2>
+<p>If phased haplotypes are available, we can efficiently construct knockoffs as follows.</p>
+<p>First, let’s generate some fake haplotypes</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="mi">50</span> <span class="c1"># Number of variables</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">K</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># Number of latent states</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># Number of emission states</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">K</span><span class="p">,</span><span class="n">K</span><span class="p">))</span> <span class="c1"># Transition matrices</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+<span class="gp">... </span>   <span class="n">Q</span><span class="p">[</span><span class="n">j</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">K</span><span class="o">*</span><span class="n">K</span><span class="p">),(</span><span class="n">K</span><span class="p">,</span><span class="n">K</span><span class="p">))</span>
+<span class="gp">... </span>   <span class="n">Q</span><span class="p">[</span><span class="n">j</span><span class="p">,:,:]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mi">10</span><span class="p">]</span><span class="o">*</span><span class="n">K</span><span class="p">)</span>
+<span class="gp">... </span>   <span class="n">Q</span><span class="p">[</span><span class="n">j</span><span class="p">,:,:]</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Q</span><span class="p">[</span><span class="n">j</span><span class="p">,:,:],</span><span class="mi">1</span><span class="p">)[:,</span><span class="bp">None</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pEmit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">p</span><span class="p">,</span><span class="n">M</span><span class="p">,</span><span class="n">K</span><span class="p">))</span> <span class="c1"># Emission probabilities</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+<span class="gp">... </span>  <span class="n">pEmit</span><span class="p">[</span><span class="n">j</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">M</span><span class="o">*</span><span class="n">K</span><span class="p">),(</span><span class="n">M</span><span class="p">,</span><span class="n">K</span><span class="p">))</span>
+<span class="gp">... </span>  <span class="n">pEmit</span><span class="p">[</span><span class="n">j</span><span class="p">,:,:]</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pEmit</span><span class="p">[</span><span class="n">j</span><span class="p">,:,:],</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pInit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="o">/</span><span class="n">K</span><span class="p">]</span><span class="o">*</span><span class="n">K</span><span class="p">)</span> <span class="c1"># Initial distribution</span>
+</pre></div>
+</div>
+<div class="highlight-pycon"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">SNPknock</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">=</span><span class="mi">100</span> <span class="c1"># Number of samples</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">modelX</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">HMM</span><span class="p">(</span><span class="n">pInit</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">pEmit</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">H</span> <span class="o">=</span> <span class="n">modelX</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+<span class="go">[[1 1 1 ... 1 1 0]</span>
+<span class="go"> [1 1 1 ... 0 0 1]</span>
+<span class="go"> [0 0 1 ... 1 0 1]</span>
+<span class="go"> ...</span>
+<span class="go"> [0 1 0 ... 1 1 1]</span>
+<span class="go"> [1 1 1 ... 0 1 1]</span>
+<span class="go"> [1 1 1 ... 0 0 1]]</span>
+</pre></div>
+</div>
+<p>Then, we fit fastPhase.</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Write binary data as phased haplotypes</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Hfp_file</span> <span class="o">=</span> <span class="s1">&#39;tmp/H.inp&#39;</span> <span class="c1"># Temporary file that will be used as input for fastPhase</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fp</span><span class="o">.</span><span class="n">writeXtoInp</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">Hfp_file</span><span class="p">,</span> <span class="n">phased</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Fit fastPhase to phased haplotypes</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fp</span><span class="o">.</span><span class="n">runFastPhase</span><span class="p">(</span><span class="n">Hfp_file</span><span class="p">,</span> <span class="n">out_path</span><span class="p">,</span> <span class="n">fastphase</span><span class="o">=</span><span class="n">fastphase</span><span class="p">,</span> <span class="n">phased</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">K</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">numit</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r_file</span>     <span class="o">=</span> <span class="n">out_path</span> <span class="o">+</span> <span class="s2">&quot;_rhat.txt&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha_file</span> <span class="o">=</span> <span class="n">out_path</span> <span class="o">+</span> <span class="s2">&quot;_alphahat.txt&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">theta_file</span> <span class="o">=</span> <span class="n">out_path</span> <span class="o">+</span> <span class="s2">&quot;_thetahat.txt&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">origchars_file</span> <span class="o">=</span> <span class="n">out_path</span> <span class="o">+</span> <span class="s2">&quot;_origchars&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hmm</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">loadHMM</span><span class="p">(</span><span class="n">r_file</span><span class="p">,</span> <span class="n">alpha_file</span><span class="p">,</span> <span class="n">theta_file</span><span class="p">,</span> <span class="n">origchars_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Finally, we generate the knockoffs</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">SNPknock</span> <span class="kn">import</span> <span class="n">knockoffHaplotypes</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">knockoffs</span> <span class="o">=</span> <span class="n">knockoffHaplotypes</span><span class="p">(</span><span class="n">hmm</span><span class="p">[</span><span class="s2">&quot;r&quot;</span><span class="p">],</span> <span class="n">hmm</span><span class="p">[</span><span class="s2">&quot;alpha&quot;</span><span class="p">],</span> <span class="n">hmm</span><span class="p">[</span><span class="s2">&quot;theta&quot;</span><span class="p">],</span> <span class="n">seed</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Hk</span> <span class="o">=</span> <span class="n">knockoffs</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">Hk</span><span class="p">)</span>
+<span class="go">[[1 1 0 ... 1 1 1]</span>
+<span class="go"> [1 1 1 ... 0 1 1]</span>
+<span class="go"> [0 1 0 ... 1 1 1]</span>
+<span class="go"> ...</span>
+<span class="go"> [0 1 0 ... 0 1 1]</span>
+<span class="go"> [1 0 1 ... 0 1 1]</span>
+<span class="go"> [0 0 1 ... 0 1 1]]</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Tutorial</a><ul>
+<li><a class="reference internal" href="#verify-installation">Verify installation</a></li>
+<li><a class="reference internal" href="#knockoffs-of-a-discrete-markov-chain">Knockoffs of a discrete Markov chain</a></li>
+<li><a class="reference internal" href="#knockoffs-of-a-hidden-markov-model">Knockoffs of a hidden Markov model</a></li>
+<li><a class="reference internal" href="#working-with-genotype-data">Working with genotype data</a></li>
+<li><a class="reference internal" href="#working-with-phased-haplotypes">Working with phased haplotypes</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SNPknock 0.8.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2019, Matteo Sesia.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.4.
+    </div>
+  </body>
+</html>
