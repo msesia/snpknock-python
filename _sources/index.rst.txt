@@ -13,6 +13,11 @@ SNPknock documentation
 
 .. include:: intro.rst
 
+Source code
+--------------------------
+
+The source code is hosted on GitHub: https://github.com/msesia/snpknock-python/
+
 Getting started
 --------------------------
 
@@ -30,3 +35,4 @@ Indices
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
