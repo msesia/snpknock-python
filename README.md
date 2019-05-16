@@ -14,8 +14,6 @@ Feature highlights:
 - Generate knockoffs for genotype and haplotype data.
 - Provides a user-friendly interface for fitting an HMM to genetic data using the software fastPhase.
 
-
-
-If you want to learn about SNPknock for large genome-wide association studies, see [*KnockoffZoom*](https://msesia.github.io/knockoffzoom).
+If you want to learn about applying SNPknock to analyze data from large genome-wide association studies, see [*KnockoffZoom*](https://msesia.github.io/knockoffzoom).
 
 Released under the GPL-v3 license - see the file LICENSE in the source distribution.
