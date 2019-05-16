@@ -1,13 +1,11 @@
-====================
-SNPknock
-====================
+# SNPknock
 
 SNPknock is a simple Python package for creating knockoffs of hidden Markov models and genetic data. 
 
 This package implements the algorithms described in the following papers:
 
- - "Gene hunting with hidden Markov model knockoffs", Sesia et al., Biometrika, 2019, (`doi:10.1093/biomet/asy033`_).
- - "Multi-resolution localization of causal variants across the genome", Sesia et al., bioRxiv, 2019, (`doi:10.1101/631390`_).
+ - "Gene hunting with hidden Markov model knockoffs", Sesia et al., Biometrika, 2019, [doi:10.1093/biomet/asy033](doi:10.1093/biomet/asy033).
+ - "Multi-resolution localization of causal variants across the genome", Sesia et al., bioRxiv, 2019, [doi:10.1101/631390](doi:10.1101/631390).
 
 Feature highlights:
 
@@ -18,6 +16,6 @@ Feature highlights:
 
 
 
-If you want to learn about SNPknock for large genome-wide association studies, see *KnockoffZoom*: `https://msesia.github.io/knockoffzoom`_.
+If you want to learn about SNPknock for large genome-wide association studies, see [*KnockoffZoom*](https://msesia.github.io/knockoffzoom).
 
 Released under the GPL-v3 license - see the file LICENSE in the source distribution.
