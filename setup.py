@@ -71,8 +71,8 @@ DEPENDENCIES = ['Cython>='+CYTHON_MIN_VERSION,
 
 def main(**extra_args):
     setup(name='SNPknock',
-          author="Matteo Sesia",
-          author_email="msesia@stanford.edu",
+          maintainer="Matteo Sesia",
+          maintainer_email="msesia@stanford.edu",
           description=DESCRIPTION,
           url="https://github.com/msesia/snpknock-python",
           license="GPL-v3 license",
