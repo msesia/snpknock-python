@@ -10,6 +10,7 @@ K = 4  # Number of states
 Q = np.zeros((p-1,K,K))
 for j in range(p-1):
     Q[j,:,:] = np.resize(np.random.uniform(size=K*K),(K,K))
+    Q[j,:,:] += np.diag([10]*K)
     Q[j,:,:] /= np.sum(Q[j,:,:],1)[:,None]
 pInit = np.zeros((K,))
 pInit[0] = 1

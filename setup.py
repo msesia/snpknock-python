@@ -79,7 +79,7 @@ def main(**extra_args):
           author="Matteo Sesia",
           author_email="msesia@stanford.edu",
           platforms="OS Independent",
-          version='0.8',
+          version='0.8.2',
           requires=REQUIRES,
           provides=["SNPknock"],
           packages     = ['SNPknock',
@@ -90,8 +90,8 @@ def main(**extra_args):
           scripts= [],
           long_description = open('README.rst', 'rt').read(),
           install_requires = DEPENDENCIES,
-          test_suite='nose.collector',
-          tests_require=['nose'],
+          setup_requires=["pytest-runner"],
+          tests_require=["pytest"],
     )
 
 #simple way to test what setup will do

@@ -20,6 +20,18 @@ import os
 import distutils.spawn
 import pdb # debug
 
+def check_writable(file_path):
+    if os.path.isfile(file_path):
+        return True
+    else:
+        try:
+            file_object = open(file_path, 'w')
+            file_object.close()
+            os.remove(file_path)
+        except:
+            return False
+    return True
+
 def writeXtoInp(X, out_file, phased=False):
     '''
     Convert the genotype data matrix X (consisting of 0,1 and 2's) into the fastPhase
@@ -53,6 +65,9 @@ def writeXtoInp(X, out_file, phased=False):
         v2 = np.array([0,0,1])
         Xp1 = v1[Xt].T
         Xp2 = v2[Xt].T
+
+    # Check whether output file can be created
+    assert check_writable(out_file), "Output file cannot be created."
 
     # Create output file
     out_f = open(out_file, 'w')
@@ -94,6 +109,12 @@ def runFastPhase(X_file, out_path, fastphase="fastphase", phased=False, K=12, nu
 
     """
 
+    # Verify that input file exists
+    assert os.path.isfile(X_file), "Input file does not exist."
+
+    # Check whether output files can be created
+    assert check_writable(out_path), "Output files cannot be created."
+
     # Verify that the fastPhase executable can be found
     fp_path = distutils.spawn.find_executable(fastphase)
     assert os.path.isfile(fp_path), "Could not find fastPhase executable.\n %s does not exist" %fastphase
@@ -133,10 +154,16 @@ def loadHMM(r_file, alpha_file, theta_file, char_file, compact=True, phased=Fals
 
     """
 
+    # Verify that input files exist
+    assert os.path.isfile(r_file), "Input file does not exist."
+    assert os.path.isfile(alpha_file), "Input file does not exist."
+    assert os.path.isfile(theta_file), "Input file does not exist."
+    assert os.path.isfile(char_file), "Input file does not exist."
+
     # Load parameter estimates from fastPhase output files
     r = _loadEMParameters(r_file).astype(float)
-    theta = np.matrix(_loadEMParameters(theta_file).astype(float))
-    alpha = np.matrix(_loadEMParameters(alpha_file).astype(float))
+    theta = _loadEMParameters(theta_file).astype(float)
+    alpha = _loadEMParameters(alpha_file).astype(float)
     origchars = _loadEMParameters(char_file)
 
     # Swap theta according to the correct definition based on the minor allele
@@ -185,8 +212,8 @@ def _computeQ1(r, alpha):
     p,K = alpha.shape
     Q = np.zeros((p-1,K,K))
     rExp = np.exp(-r)
-    for j in range(1,p):
-        Q1 = np.repeat( (1-rExp[j])*alpha[j,:], K, 0)
+    for j in np.arange(1,p):
+        Q1 = np.repeat( (1-rExp[j])*np.reshape(alpha[j,:],(1,K)), K, 0)
         Q1[np.diag_indices(K)] += rExp[j]
         Q[j-1,:,:] = Q1
     return Q
@@ -247,7 +274,7 @@ def _assembleEmissionP(theta):
 #               if abs(np.sum(pEmit1[:,i])-1)>1e-6:
 #                   raise ValueError('Warning: incorrect normalization of emission probabilities! Perhaps a numerical error in fastPhase?')
                 pEmit1[:,i] /= np.sum(pEmit1[:,i]) # Normalize to compensate for numerical errors
-        pEmit[m,:,:] = np.matrix(pEmit1)
+        pEmit[m,:,:] = pEmit1
     return pEmit
 
 def _assemblePInit_phased(alpha):
