@@ -1,0 +1,2 @@
+/home/msesia/bin/fastphase -Pp -T1 -K12 -g -H-4 -C25 -B -S1 -otmp/example tmp/H.inp 
+1	-2939.709502

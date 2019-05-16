@@ -1,0 +1,177 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Download and install &#8212; SNPknock 0.8.2 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.8.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SNPknock 0.8.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="download-and-install">
+<h1>Download and install<a class="headerlink" href="#download-and-install" title="Permalink to this headline">¶</a></h1>
+<p>This section covers the necessary steps to install and run SNPknock. Below
+is a list of required dependencies, along with additional software
+recommendations.
+The following instructions are for Linux and Mac users.
+It may be possible to compile the sources under Windows, but we are
+not providing support for Windows.</p>
+<p>SNPknock is currently under development and it should be considered to be
+of <em>beta</em> quality. Any feedback will be greatly appreciated.</p>
+<div class="section" id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p><strong>Python</strong> 2.7.5 or later</p>
+<dl class="docutils">
+<dt><strong>NumPy</strong> 1.13.1 or later</dt>
+<dd>A high-level, optimized scientific computing Python library.</dd>
+<dt><strong>Cython</strong> 0.26 or later</dt>
+<dd>Cython is a language that is a fusion of Python and C.  It allows us
+to write fast code using Python and C syntax, so that it easier to
+read and maintain. You need Cython if you are building the
+development source code (and that is what you have to do at the
+moment, because we don’t yet have a release).</dd>
+<dt><strong>gcc</strong> 5.3.0 or later</dt>
+<dd>The GNU Compiler Collection (GCC) is a compiler system produced by the
+GNU Project supporting various programming languages. Here, it is needed
+to compile the core of the SNPknock source code that is written in C++.</dd>
+</dl>
+</div></blockquote>
+</div>
+<div class="section" id="building-from-source-code">
+<span id="building-source"></span><h2>Building from source code<a class="headerlink" href="#building-from-source-code" title="Permalink to this headline">¶</a></h2>
+<p>The source code is available on <a class="reference external" href="https://github.com/msesia/snpknock-python">GitHub</a>.</p>
+<p>Clone the repository and enter the source directory. Then, you can build the SNPknock package with:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build</span>
+</pre></div>
+</div>
+<p>To install, simply do:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>As with any python installation, this will install the modules
+in your system python <em>site-packages</em> directory (which is why you
+need <em>sudo</em>).  Many of us prefer to install development packages in a
+local directory so as to leave the system python alone.  This is
+mearly a preference, nothing will go wrong if you install using the
+<em>sudo</em> method. To install for the current user, use:</p>
+<div class="last highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="installing-via-pip">
+<h2>Installing via pip<a class="headerlink" href="#installing-via-pip" title="Permalink to this headline">¶</a></h2>
+<p>SNPknock can be easily installed through pip:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">SNPknock</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>As with any python installation, this will install the modules
+in your system python <em>site-packages</em> directory (which is why you
+need <em>sudo</em>).  Many of us prefer to install development packages in a
+local directory so as to leave the system python alone.  This is
+mearly a preference, nothing will go wrong if you install using the
+<em>sudo</em> method. To install for the current user, use:</p>
+<div class="last highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">SNPknock</span> <span class="o">--</span><span class="n">user</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="run-tests">
+<h2>Run tests<a class="headerlink" href="#run-tests" title="Permalink to this headline">¶</a></h2>
+<p>To run the default tests, enter the main project directory type:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pytest</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Download and install</a><ul>
+<li><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li><a class="reference internal" href="#building-from-source-code">Building from source code</a></li>
+<li><a class="reference internal" href="#installing-via-pip">Installing via pip</a></li>
+<li><a class="reference internal" href="#run-tests">Run tests</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SNPknock 0.8.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2019, Matteo Sesia.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.4.
+    </div>
+  </body>
+</html>
