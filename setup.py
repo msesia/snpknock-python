@@ -1,5 +1,7 @@
 # This file is part of SNPknock.
 
+#     Copyright (C) 2017-2019 Matteo Sesia
+
 #     SNPknock is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
 #     the Free Software Foundation, either version 3 of the License, or
@@ -24,7 +26,7 @@ CLASSIFIERS = ["Development Status :: 4 - Beta",
                "Programming Language :: Python",
                "Topic :: Scientific/Engineering"]
 
-DESCRIPTION = 'Generates knockoff copies of HMMs and genomic data.'
+DESCRIPTION = 'Generates knockoffs of HMMs and genetic data.'
 
 NUMPY_MIN_VERSION = '1.13.1'
 CYTHON_MIN_VERSION = '0.26'
@@ -69,11 +71,10 @@ DEPENDENCIES = ['Cython>='+CYTHON_MIN_VERSION,
 
 def main(**extra_args):
     setup(name='SNPknock',
-          maintainer="Matteo Sesia",
-          maintainer_email="msesia@stanford.edu",
+          author="Matteo Sesia",
+          author_email="msesia@stanford.edu",
           description=DESCRIPTION,
-          url="http://web.stanford.edu/~msesia/snpknock/",
-          download_url="http://web.stanford.edu/~msesia/snpknock/install.html",
+          url="https://github.com/msesia/snpknock-python",
           license="GPL-v3 license",
           classifiers=CLASSIFIERS,
           author="Matteo Sesia",
