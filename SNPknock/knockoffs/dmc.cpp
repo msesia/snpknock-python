@@ -118,6 +118,7 @@ std::vector<int> KnockoffDMC::sample(const std::vector<int>& X, const arma::cube
     Z = Z0.t() * Q1;                                          // First element of cluster
     if( ind[L-1]<(p-1) )                                      // Last element of cluster (outside)
       Z = Q.slice(ind[L-1]+1).t() * Z;
+    Z.for_each( [](arma::mat::elem_type& val) { val = std::max(1e-50,val); } );  // Avoid divisions by zero
 
     // Backpropagate normalization for conditional HMM
     arma::mat QN(K,L);

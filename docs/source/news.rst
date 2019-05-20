@@ -1,6 +1,7 @@
 News
 --------------------------
 
+  * version 0.8.3 - Fixed division-by-zero bug (05/20/2019)
   * version 0.8.2 - Major upgrade, with support for group knockoffs and faster computations for genetic data (05/14/2019)
   * version 0.5.0 - First beta release (10/04/2017)
   * version 0.5.1 - Small patches (10/07/2017)
